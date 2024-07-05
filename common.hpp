@@ -26,6 +26,8 @@ const int BATCH_SIZE = 1000; // Tunable batch size
 const double TIME_WINDOW = 1000.0; // used by CluStream and EDMStream
 const int K = 5; // used by SLKMeans.
 
+#include <cmath>
+#include <memory>
 #include <vector>
 
 #endif //PDSC_COMMON_HPP
