@@ -27,17 +27,14 @@ cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j$(nproc)
 ```
 
-### Run Tests
-Download the datasets from [Zenodo](https://zenodo.org/records/8210331) and put them in the `datasets` directory:
+### Run Benchmark
+Download datasets from [Releases](https://github.com/intellistream/PDSC/releases/tag/dataset):
 ```bash
-cd Sesame/datasets
-pip3 install zenodo_get
-zenodo_get 8210331
+wget https://github.com/intellistream/PDSC/releases/download/dataset/covtype.csv
 ```
-Run the tests:
+Run the benchmark:
 ```bash
-cd Sesame/build/test
-./google_test
+./pdsc /path/to/{dataset}.csv
 ```
 
 ## Real-world algorithms
@@ -65,7 +62,6 @@ cd Sesame/build/test
 | EDS       | 45690, 100270, 150645, 200060, 245270 | 2         | 75, 145, 218, 289, 363 |
 | ODS       | 94720,97360,100000                    | 2         | 90, 90, 90             |
 
-Datasets can download from zenodo: https://zenodo.org/records/8210331
 
 ## Reference
 
