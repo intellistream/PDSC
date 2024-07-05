@@ -17,6 +17,7 @@
 #ifndef PDSC_POINT_HPP
 #define PDSC_POINT_HPP
 
+#include <iostream>
 #include <vector>
 
 struct Point {
@@ -24,8 +25,17 @@ struct Point {
   double timestamp;
 
   Point(int dimensions) : coordinates(dimensions, 0.0), timestamp(0.0) {}
+  Point(std::vector<double> coords, double timestamp = 0.0)
+      : coordinates(coords), timestamp(timestamp) {}
+  Point &operator/=(double scalar) {
+    for (int i = 0; i < coordinates.size(); i++) {
+      coordinates[i] /= scalar;
+    }
+    return *this;
+  }
 };
 
 std::vector<Point> generateDataPoints(int numPoints, int dimensions);
+std::ostream &operator<<(std::ostream &os, const Point &point);
 
 #endif // PDSC_POINT_HPP

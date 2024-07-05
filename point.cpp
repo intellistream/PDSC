@@ -14,26 +14,39 @@
  * limitations under the License.
  */
 
-
 #ifndef POINTGENERATION_HPP
 #define POINTGENERATION_HPP
 
 #include "point.hpp"
 
-#include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <vector>
 
 std::vector<Point> generateDataPoints(int numPoints, int dimensions) {
-    std::vector<Point> dataPoints(numPoints, Point(dimensions));
-    srand(static_cast<unsigned>(time(0)));
-    for (int i = 0; i < numPoints; ++i) {
-        for (int j = 0; j < dimensions; ++j) {
-            dataPoints[i].coordinates[j] = static_cast<double>(rand()) / RAND_MAX * 100;
-        }
-        dataPoints[i].timestamp = i; // Example timestamp, could be any sequence
+  std::vector<Point> dataPoints(numPoints, Point(dimensions));
+  srand(static_cast<unsigned>(time(0)));
+  for (int i = 0; i < numPoints; ++i) {
+    for (int j = 0; j < dimensions; ++j) {
+      dataPoints[i].coordinates[j] =
+          static_cast<double>(rand()) / RAND_MAX * 100;
     }
-    return dataPoints;
+    dataPoints[i].timestamp = i; // Example timestamp, could be any sequence
+  }
+  return dataPoints;
+}
+
+// ostream operator for Point
+std::ostream &operator<<(std::ostream &os, const Point &point) {
+  os << "Point(";
+  for (int i = 0; i < point.coordinates.size(); i++) {
+    os << point.coordinates[i];
+    if (i < point.coordinates.size() - 1) {
+      os << ", ";
+    }
+  }
+  os << ")";
+  return os;
 }
 
 #endif // POINTGENERATION_HPP

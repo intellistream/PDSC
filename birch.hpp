@@ -60,12 +60,11 @@ struct ClusteringFeature {
 };
 
 struct CFNode;
-using CFNodePtr = std::shared_ptr<CFNode>;
 
 struct CFNode {
   bool isLeaf;
   std::vector<ClusteringFeature> entries;
-  std::vector<CFNodePtr> children;
+  std::vector<CFNode *> children;
 
   CFNode(bool leaf) : isLeaf(leaf) {
     entries.reserve(MAX_ENTRIES);
@@ -88,11 +87,31 @@ public:
     }
   }
 
+  std::vector<Point> output_centers() {
+    std::vector<Point> centers;
+    output_centers_recursive(root, centers);
+    return centers;
+  }
+
+  void output_centers_recursive(CFNode *node, std::vector<Point> &centers) {
+    if (node->isLeaf) {
+      for (const auto &cf : node->entries) {
+        Point center(cf.linear_sum);
+        center /= cf.n;
+        centers.push_back(center);
+      }
+    } else {
+      for (const auto &child : node->children) {
+        output_centers_recursive(child, centers);
+      }
+    }
+  }
+
 private:
   int dimensions;
-  CFNodePtr root;
+  CFNode *root;
 
-  void insertCF(CFNodePtr &node, ClusteringFeature &cf, const Point &point) {
+  void insertCF(CFNode *&node, ClusteringFeature &cf, const Point &point) {
     if (node->isLeaf) {
       // Find the closest CF entry
       int closestIndex = -1;
@@ -137,9 +156,9 @@ private:
     }
   }
 
-  void splitNode(CFNodePtr &node) {
+  void splitNode(CFNode *&node) {
     // Split the node into two nodes
-    CFNodePtr newNode(new CFNode(node->isLeaf));
+    CFNode *newNode(new CFNode(node->isLeaf));
     for (int i = 0; i < node->entries.size() / 2; i++) {
       newNode->entries.push_back(node->entries.back());
       node->entries.pop_back();
@@ -154,20 +173,20 @@ private:
 
     // Add the new node to the parent
     if (node == root) {
-      CFNodePtr newRoot(new CFNode(false));
+      CFNode *newRoot(new CFNode(false));
       newRoot->entries.push_back(ClusteringFeature(dimensions));
       newRoot->children.push_back(root);
       newRoot->children.push_back(newNode);
       root = newRoot;
     } else {
       // Add the new node to the parent's children
-      CFNodePtr parent = findParent(root, node);
+      CFNode *parent = findParent(root, node);
       parent->children.push_back(newNode);
       parent->entries.push_back(ClusteringFeature(dimensions));
     }
   }
 
-  CFNodePtr findParent(CFNodePtr node, CFNodePtr target) {
+  CFNode *findParent(CFNode *node, CFNode *target) {
     if (node->isLeaf) {
       return nullptr;
     }
@@ -176,7 +195,7 @@ private:
       if (child == target) {
         return node;
       } else {
-        CFNodePtr parent = findParent(child, target);
+        CFNode *parent = findParent(child, target);
         if (parent != nullptr) {
           return parent;
         }
