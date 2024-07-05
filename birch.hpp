@@ -17,8 +17,8 @@
 #ifndef PDSC_BIRCH_HPP
 #define PDSC_BIRCH_HPP
 
+#include "algorithm.hpp"
 #include "common.hpp"
-#include "point.hpp"
 
 #include <limits>
 
@@ -72,7 +72,7 @@ struct CFNode {
   }
 };
 
-class BIRCH {
+class BIRCH : public Algorithm {
 public:
   BIRCH(int dimensions) : dimensions(dimensions), root(new CFNode(true)) {}
 

@@ -38,9 +38,10 @@ std::vector<int> group_by_centers(const std::vector<Point> &points,
 }
 
 double evaluate_purity(const std::vector<Point> &points,
-                       const std::vector<int> &predicts,
-                       u32 num_true_clusters) {
-  std::vector<std::vector<int>> cluster_to_label(num_true_clusters);
+                       const std::vector<int> &predicts, u32 num_true_clusters,
+                       u32 num_pred_clusters) {
+  std::vector<std::vector<int>> cluster_to_label(
+      std::max(num_true_clusters, num_pred_clusters));
 
   for (int i = 0; i < points.size(); i++) {
     cluster_to_label[predicts[i]].push_back(points[i].true_clu_id);

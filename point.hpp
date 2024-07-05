@@ -28,8 +28,7 @@
 
 struct Point {
   std::vector<f64> features;
-  u64 timestamp;
-  u64 true_clu_id;
+  u64 timestamp, true_clu_id;
 
   Point(int dim) : features(dim, 0.0), timestamp(0) {}
   Point(std::vector<double> coords, double timestamp = 0.0)

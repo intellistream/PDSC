@@ -17,7 +17,7 @@
 #ifndef PDSC_CLUSTREAM_HPP
 #define PDSC_CLUSTREAM_HPP
 
-#include "common.hpp"
+#include "algorithm.hpp"
 
 const int MAX_MICRO_CLUSTERS = 100;
 
@@ -64,7 +64,7 @@ struct MicroCluster {
   }
 };
 
-class CluStream {
+class CluStream : public Algorithm {
 public:
   CluStream(int dimensions) : dimensions(dimensions) {}
 
@@ -112,10 +112,22 @@ public:
     }
   }
 
+  std::vector<Point> output_centers() {
+    std::vector<Point> centers;
+    for (const auto &mc : micro_clusters) {
+      if (mc.isWithinTimeWindow(micro_clusters.back().last_update_time)) {
+        Point center(mc.linear_sum);
+        center /= mc.n;
+        centers.push_back(center);
+      }
+    }
+    return centers;
+  }
+
 private:
   int dimensions;
   std::vector<MicroCluster> micro_clusters;
-  const double threshold = 1.0; // Threshold for micro-cluster distance
+  const double threshold = 2500.0; // Threshold for micro-cluster distance
 
   void removeOldestMicroCluster(double current_time) {
     int oldestIndex = -1;
