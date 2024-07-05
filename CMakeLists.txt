@@ -7,14 +7,13 @@ include_directories(.)
 
 add_executable(pdsc
         main.cpp
-        main.h
-        BIRCH.hpp
+        birch.hpp
         common.hpp
         common.cpp
-        CluStream.hpp
-        Point.hpp
-        Point.cpp
-        EDMStream.hpp
-        SLKMeans.hpp
-        DenStream.hpp
-        DStream.hpp)
+        clustream.hpp
+        point.hpp
+        point.cpp
+        edmstream.hpp
+        slkmeans.hpp
+        denstream.hpp
+        dstream.hpp)

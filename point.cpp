@@ -18,7 +18,8 @@
 #ifndef POINTGENERATION_HPP
 #define POINTGENERATION_HPP
 
-#include "Point.hpp"
+#include "point.hpp"
+
 #include <vector>
 #include <cstdlib>
 #include <ctime>

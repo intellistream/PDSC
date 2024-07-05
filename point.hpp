@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-#ifndef PDSC_POINT_H
-#define PDSC_POINT_H
+#ifndef PDSC_POINT_HPP
+#define PDSC_POINT_HPP
 
 #include <vector>
 
 struct Point {
-    std::vector<double> coordinates;
-    double timestamp;
+  std::vector<double> coordinates;
+  double timestamp;
 
-    Point(int dimensions) : coordinates(dimensions, 0.0), timestamp(0.0) {}
+  Point(int dimensions) : coordinates(dimensions, 0.0), timestamp(0.0) {}
 };
 
 std::vector<Point> generateDataPoints(int numPoints, int dimensions);
 
-#endif //PDSC_POINT_H
+#endif // PDSC_POINT_HPP

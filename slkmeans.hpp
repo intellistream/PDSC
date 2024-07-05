@@ -17,7 +17,7 @@
 #ifndef PDSC_SLKMEANS_HPP
 #define PDSC_SLKMEANS_HPP
 
-#include "Point.hpp"
+#include "point.hpp"
 #include "common.hpp"
 #include <vector>
 #include <cmath>
