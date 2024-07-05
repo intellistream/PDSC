@@ -17,7 +17,7 @@
 #ifndef DSTREAM_HPP
 #define DSTREAM_HPP
 
-#include "point.hpp"
+#include "algorithm.hpp"
 
 #include <cmath>
 #include <limits>
@@ -54,7 +54,7 @@ struct Cell {
   }
 };
 
-class DStream {
+class DStream : public Algorithm {
 public:
   DStream(int dimensions) : dimensions(dimensions) {}
 
@@ -94,10 +94,22 @@ public:
     }
   }
 
+  std::vector<Point> output_centers() {
+    std::vector<Point> centers;
+    for (const auto &cell : grid) {
+      if (cell.second.density > 0.0) {
+        Point center(cell.second.coordinates);
+        center /= cell.second.density;
+        centers.push_back(center);
+      }
+    }
+    return centers;
+  }
+
 private:
   int dimensions;
   std::unordered_map<std::string, Cell> grid;
-  const double TIME_WINDOW = 1000.0;
+  const double TIME_WINDOW = 100.0;
 
   std::string createCellKey(const std::vector<double> &coordinates) const {
     std::string key;

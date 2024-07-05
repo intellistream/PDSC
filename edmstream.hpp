@@ -17,8 +17,8 @@
 #ifndef PDSC_EDMSTREAM_HPP
 #define PDSC_EDMSTREAM_HPP
 
+#include "algorithm.hpp"
 #include "common.hpp"
-#include "point.hpp"
 
 const int MAX_CLUSTERS = 100;
 const double DECAY_RATE = 0.01;
@@ -63,11 +63,11 @@ public:
   DPNode(const ClusterCell &c) : cell(c) {}
 };
 
-class DP_Tree {
+class DPTree {
 public:
   DPNode *root;
 
-  DP_Tree() : root(nullptr) {}
+  DPTree() : root(nullptr) {}
 
   void addClusterCell(const ClusterCell &cell) {
     if (!root) {
@@ -104,9 +104,9 @@ private:
   }
 };
 
-class EDMStream {
+class EDMStream : public Algorithm {
 public:
-  EDMStream(int dimensions) : dimensions(dimensions), dp_tree(new DP_Tree()) {}
+  EDMStream(int dimensions) : dimensions(dimensions), dp_tree(new DPTree()) {}
 
   void insert(const Point &point) {
     // Decay existing clusters
@@ -127,8 +127,27 @@ public:
     }
   }
 
+  std::vector<Point> output_centers() {
+    std::vector<Point> centers;
+    output_centers_recursive(dp_tree->root, centers);
+    return centers;
+  }
+
+  void output_centers_recursive(DPNode *node, std::vector<Point> &centers) {
+    if (!node)
+      return;
+    if (node->cell.density > 0.0) {
+      Point center(node->cell.seed.features);
+      center /= node->cell.density;
+      centers.push_back(center);
+    }
+    for (auto &child : node->children) {
+      output_centers_recursive(child, centers);
+    }
+  }
+
 private:
   int dimensions;
-  DP_Tree *dp_tree;
+  DPTree *dp_tree;
 };
 #endif // PDSC_EDMSTREAM_HPP

@@ -127,7 +127,7 @@ public:
 private:
   int dimensions;
   std::vector<MicroCluster> micro_clusters;
-  const double threshold = 2500.0; // Threshold for micro-cluster distance
+  const double threshold = 350.0; // Threshold for micro-cluster distance
 
   void removeOldestMicroCluster(double current_time) {
     int oldestIndex = -1;

@@ -24,12 +24,11 @@
 #include "point.hpp"
 #include "slkmeans.hpp"
 
+#include <cassert>
 #include <chrono>
 #include <cstdlib>
 #include <iostream>
 #include <vector>
-
-// Similar placeholder classes for SLKMeans, EDMStream
 
 using namespace std;
 using namespace std::chrono_literals;
@@ -46,6 +45,7 @@ void run(const Dataset &dataset, Algorithm &algo) {
   cout << "Execution time: " << elapsed.count() << " ms" << endl;
   auto centers = algo.output_centers();
   cout << "Number of clusters: " << centers.size() << endl;
+  assert(centers.size() > 0 && centers.size() <= 1000);
   auto purity =
       evaluate_purity(dataset.points, group_by_centers(dataset.points, centers),
                       dataset.num_true_clusters, centers.size());
@@ -67,84 +67,40 @@ int main(int argc, char *argv[]) {
   cout << dataset << endl;
 
   // Benchmark BIRCH
-  cout << "====================" << endl;
+  cout << "==============================" << endl;
   cout << "Running BIRCH ..." << endl;
   BIRCH birch(dataset.dim);
   run(dataset, birch);
 
   // Benchmark CluStream
-  cout << "====================" << endl;
+  cout << "==============================" << endl;
   cout << "Running CluStream ..." << endl;
-  // Create CluStream instance
-  CluStream cluStream(dataset.dim);
-  run(dataset, cluStream);
+  CluStream clustream(dataset.dim);
+  run(dataset, clustream);
 
-  // // Benchmark EDMStream
-  // cout << "Running EDMStream ..." << endl;
-  // // Create EDMStream instance
-  // EDMStream edmStream(dataset.dim);
-  // start = chrono::high_resolution_clock::now();
-  // for (int i = 0; i < NUM_POINTS; i += BATCH_SIZE) {
-  //   int end = min(i + BATCH_SIZE, NUM_POINTS);
-  //   vector<Point> batch(dataset.points.begin() + i,
-  //                       dataset.points.begin() + end);
-  //   edmStream.cluster(batch);
-  // }
-  // end = chrono::high_resolution_clock::now();
-  // elapsed = end - start;
-  // cout << "EDMStream execution time with batch size " << BATCH_SIZE << ": "
-  //      << elapsed.count() << " seconds" << endl;
+  // Benchmark EDMStream
+  cout << "==============================" << endl;
+  cout << "Running EDMStream ..." << endl;
+  EDMStream edm(dataset.dim);
+  run(dataset, edm);
 
-  // // Benchmark DStream
-  // cout << "Running DStream ..." << endl;
-  // // Create DStream instance
-  // DStream dStream(dataset.dim);
+  // Benchmark DStream
+  cout << "==============================" << endl;
+  cout << "Running DStream ..." << endl;
+  DStream dstream(dataset.dim);
+  run(dataset, dstream);
 
-  // start = chrono::high_resolution_clock::now();
-  // for (int i = 0; i < NUM_POINTS; i += BATCH_SIZE) {
-  //   int end = min(i + BATCH_SIZE, NUM_POINTS);
-  //   vector<Point> batch(dataset.points.begin() + i,
-  //                       dataset.points.begin() + end);
-  //   dStream.cluster(batch);
-  // }
-  // end = chrono::high_resolution_clock::now();
-  // elapsed = end - start;
-  // cout << "DStream execution time with batch size " << BATCH_SIZE << ": "
-  //      << elapsed.count() << " seconds" << endl;
+  // Benchmark DenStream
+  cout << "==============================" << endl;
+  cout << "Running DenStream ..." << endl;
+  DenStream denstream(dataset.dim);
+  run(dataset, denstream);
 
-  // // Benchmark DenStream
-  // cout << "Running DenStream ..." << endl;
-  // // Create DStream instance
-  // DenStream denStreamm(dataset.dim);
-
-  // start = chrono::high_resolution_clock::now();
-  // for (int i = 0; i < NUM_POINTS; i += BATCH_SIZE) {
-  //   int end = min(i + BATCH_SIZE, NUM_POINTS);
-  //   vector<Point> batch(dataset.points.begin() + i,
-  //                       dataset.points.begin() + end);
-  //   denStreamm.cluster(batch);
-  // }
-  // end = chrono::high_resolution_clock::now();
-  // elapsed = end - start;
-  // cout << "DenStream execution time with batch size " << BATCH_SIZE << ": "
-  //      << elapsed.count() << " seconds" << endl;
-
-  // // Benchmark SLKMeans
+  // Benchmark SLKMeans
+  // cout << "==============================" << endl;
   // cout << "Running SLKMeans ..." << endl;
-  // // Create SLKMeans instance
-  // SLKMeans slkmeans(dataset.dim, K);
-
-  // start = chrono::high_resolution_clock::now();
-  // for (int i = 0; i < NUM_POINTS; i += BATCH_SIZE) {
-  //   int end = min(i + BATCH_SIZE, NUM_POINTS);
-  //   vector<Point> batch(dataset.points.begin() + i,
-  //                       dataset.points.begin() + end);
-  //   slkmeans.cluster(batch);
-  // }
-  // end = chrono::high_resolution_clock::now();
-  // elapsed = end - start;
-  // cout << "SLKMeans execution time with batch size " << BATCH_SIZE << ": "
-  //      << elapsed.count() << " seconds" << endl;
+  // SLKMeans slkmeans(dataset.dim, dataset.num_true_clusters);
+  // run(dataset, slkmeans);
 
   return 0;
 }

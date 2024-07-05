@@ -44,7 +44,7 @@ double evaluate_purity(const std::vector<Point> &points,
       std::max(num_true_clusters, num_pred_clusters));
 
   for (int i = 0; i < points.size(); i++) {
-    cluster_to_label[predicts[i]].push_back(points[i].true_clu_id);
+    cluster_to_label[predicts[i]].push_back(points[i].true_clu_id - 1);
   }
 
   double purity = 0.0;

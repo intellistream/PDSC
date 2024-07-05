@@ -90,6 +90,7 @@ struct Dataset {
         }
         std::getline(ss, token, ',');
         point.true_clu_id = std::stoull(token);
+        point.timestamp = i + 1; // Example timestamp, could be any sequence
         points.push_back(point);
       }
       file.close();

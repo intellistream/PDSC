@@ -17,7 +17,7 @@
 #ifndef DENSTREAM_HPP
 #define DENSTREAM_HPP
 
-#include "point.hpp"
+#include "algorithm.hpp"
 
 #include <cmath>
 #include <deque>
@@ -58,7 +58,7 @@ struct DenStreamMicroCluster {
   }
 };
 
-class DenStream {
+class DenStream : public Algorithm {
 public:
   DenStream(int dimensions) : dimensions(dimensions) {}
 
@@ -100,6 +100,18 @@ public:
     for (const auto &point : points) {
       insert(point);
     }
+  }
+
+  std::vector<Point> output_centers() {
+    std::vector<Point> centers;
+    for (const auto &cluster : clusters) {
+      if (cluster.weight >= MIN_POINTS) {
+        Point center(cluster.linear_sum);
+        center /= cluster.n;
+        centers.push_back(center);
+      }
+    }
+    return centers;
   }
 
 private:
