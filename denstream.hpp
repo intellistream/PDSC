@@ -41,18 +41,18 @@ struct DenStreamMicroCluster {
   void addPoint(const Point &point, double timestamp) {
     n++;
     weight += 1;
-    for (int i = 0; i < point.coordinates.size(); i++) {
-      linear_sum[i] += point.coordinates[i];
-      squared_sum[i] += point.coordinates[i] * point.coordinates[i];
+    for (int i = 0; i < point.features.size(); i++) {
+      linear_sum[i] += point.features[i];
+      squared_sum[i] += point.features[i] * point.features[i];
     }
     creation_time = timestamp;
   }
 
   double calcDistance(const Point &point) const {
     double dist = 0.0;
-    for (int i = 0; i < point.coordinates.size(); i++) {
+    for (int i = 0; i < point.features.size(); i++) {
       double mean = linear_sum[i] / n;
-      dist += (point.coordinates[i] - mean) * (point.coordinates[i] - mean);
+      dist += (point.features[i] - mean) * (point.features[i] - mean);
     }
     return sqrt(dist);
   }

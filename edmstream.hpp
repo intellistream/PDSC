@@ -34,8 +34,8 @@ struct ClusterCell {
         creation_time(0.0) {}
 
   void addPoint(const Point &point) {
-    for (int i = 0; i < point.coordinates.size(); i++) {
-      seed.coordinates[i] += point.coordinates[i];
+    for (int i = 0; i < point.features.size(); i++) {
+      seed.features[i] += point.features[i];
     }
     density += 1.0; // Simplified for illustration
     seed.timestamp = point.timestamp;
@@ -47,9 +47,9 @@ struct ClusterCell {
 
   double calcDistance(const Point &point) const {
     double dist = 0.0;
-    for (int i = 0; i < point.coordinates.size(); i++) {
-      dist += (point.coordinates[i] - seed.coordinates[i]) *
-              (point.coordinates[i] - seed.coordinates[i]);
+    for (int i = 0; i < point.features.size(); i++) {
+      dist += (point.features[i] - seed.features[i]) *
+              (point.features[i] - seed.features[i]);
     }
     return sqrt(dist);
   }

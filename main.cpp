@@ -20,6 +20,7 @@
 #include "denstream.hpp"
 #include "dstream.hpp"
 #include "edmstream.hpp"
+#include "evaluation.hpp"
 #include "point.hpp"
 #include "slkmeans.hpp"
 
@@ -30,103 +31,126 @@
 
 // Similar placeholder classes for SLKMeans, EDMStream
 
-int main() {
-  std::cout << "Starting benchmarks..." << std::endl;
+using namespace std;
 
-  // Generate random data points
-  std::vector<Point> dataPoints = generateDataPoints(NUM_POINTS, DIMENSIONS);
+int main(int argc, char *argv[]) {
+  cout << "Starting benchmarks..." << endl;
+
+  Dataset dataset;
+  if (argc < 2) {
+    cout << "Usage: " << argv[0] << " <dataset>" << endl;
+    cout << "Using random generated dataset, results may vary." << endl;
+    dataset.gen(NUM_POINTS, DIMENSIONS);
+  } else {
+    dataset.load(argv[1]);
+  }
+
+  cout << dataset << endl;
 
   // Benchmark BIRCH
-  std::cout << "Running BIRCH ..." << std::endl;
-  BIRCH birch(DIMENSIONS);
-  auto start = std::chrono::high_resolution_clock::now();
+  cout << "Running BIRCH ..." << endl;
+  BIRCH birch(dataset.dim);
+  auto start = chrono::high_resolution_clock::now();
   for (int i = 0; i < NUM_POINTS; i += BATCH_SIZE) {
-    int end = std::min(i + BATCH_SIZE, NUM_POINTS);
-    std::vector<Point> batch(dataPoints.begin() + i, dataPoints.begin() + end);
+    int end = min(i + BATCH_SIZE, NUM_POINTS);
+    vector<Point> batch(dataset.points.begin() + i,
+                        dataset.points.begin() + end);
     birch.cluster(batch);
   }
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> elapsed = end - start;
-  std::cout << "BIRCH execution time with batch size " << BATCH_SIZE << ": "
-            << elapsed.count() << " seconds" << std::endl;
+  auto end = chrono::high_resolution_clock::now();
+  chrono::duration<double> elapsed = end - start;
+  cout << "BIRCH execution time with batch size " << BATCH_SIZE << ": "
+       << elapsed.count() << " seconds" << endl;
+
+  auto centers = birch.output_centers();
+  cout << "Number of clusters: " << centers.size() << endl;
+  auto purity =
+      evaluate_purity(dataset.points, group_by_centers(dataset.points, centers),
+                      dataset.num_true_clusters);
+  cout << "Purity: " << purity << endl;
 
   // Benchmark CluStream
-  std::cout << "Running CluStream ..." << std::endl;
+  cout << "Running CluStream ..." << endl;
   // Create CluStream instance
-  CluStream cluStream(DIMENSIONS);
-  start = std::chrono::high_resolution_clock::now();
+  CluStream cluStream(dataset.dim);
+  start = chrono::high_resolution_clock::now();
   for (int i = 0; i < NUM_POINTS; i += BATCH_SIZE) {
-    int end = std::min(i + BATCH_SIZE, NUM_POINTS);
-    std::vector<Point> batch(dataPoints.begin() + i, dataPoints.begin() + end);
+    int end = min(i + BATCH_SIZE, NUM_POINTS);
+    vector<Point> batch(dataset.points.begin() + i,
+                        dataset.points.begin() + end);
     cluStream.cluster(batch);
   }
-  end = std::chrono::high_resolution_clock::now();
+  end = chrono::high_resolution_clock::now();
   elapsed = end - start;
-  std::cout << "CluStream execution time with batch size " << BATCH_SIZE << ": "
-            << elapsed.count() << " seconds" << std::endl;
+  cout << "CluStream execution time with batch size " << BATCH_SIZE << ": "
+       << elapsed.count() << " seconds" << endl;
 
   // Benchmark EDMStream
-  std::cout << "Running EDMStream ..." << std::endl;
+  cout << "Running EDMStream ..." << endl;
   // Create EDMStream instance
-  EDMStream edmStream(DIMENSIONS);
-  start = std::chrono::high_resolution_clock::now();
+  EDMStream edmStream(dataset.dim);
+  start = chrono::high_resolution_clock::now();
   for (int i = 0; i < NUM_POINTS; i += BATCH_SIZE) {
-    int end = std::min(i + BATCH_SIZE, NUM_POINTS);
-    std::vector<Point> batch(dataPoints.begin() + i, dataPoints.begin() + end);
+    int end = min(i + BATCH_SIZE, NUM_POINTS);
+    vector<Point> batch(dataset.points.begin() + i,
+                        dataset.points.begin() + end);
     edmStream.cluster(batch);
   }
-  end = std::chrono::high_resolution_clock::now();
+  end = chrono::high_resolution_clock::now();
   elapsed = end - start;
-  std::cout << "EDMStream execution time with batch size " << BATCH_SIZE << ": "
-            << elapsed.count() << " seconds" << std::endl;
+  cout << "EDMStream execution time with batch size " << BATCH_SIZE << ": "
+       << elapsed.count() << " seconds" << endl;
 
   // Benchmark DStream
-  std::cout << "Running DStream ..." << std::endl;
+  cout << "Running DStream ..." << endl;
   // Create DStream instance
-  DStream dStream(DIMENSIONS);
+  DStream dStream(dataset.dim);
 
-  start = std::chrono::high_resolution_clock::now();
+  start = chrono::high_resolution_clock::now();
   for (int i = 0; i < NUM_POINTS; i += BATCH_SIZE) {
-    int end = std::min(i + BATCH_SIZE, NUM_POINTS);
-    std::vector<Point> batch(dataPoints.begin() + i, dataPoints.begin() + end);
+    int end = min(i + BATCH_SIZE, NUM_POINTS);
+    vector<Point> batch(dataset.points.begin() + i,
+                        dataset.points.begin() + end);
     dStream.cluster(batch);
   }
-  end = std::chrono::high_resolution_clock::now();
+  end = chrono::high_resolution_clock::now();
   elapsed = end - start;
-  std::cout << "DStream execution time with batch size " << BATCH_SIZE << ": "
-            << elapsed.count() << " seconds" << std::endl;
+  cout << "DStream execution time with batch size " << BATCH_SIZE << ": "
+       << elapsed.count() << " seconds" << endl;
 
   // Benchmark DenStream
-  std::cout << "Running DenStream ..." << std::endl;
+  cout << "Running DenStream ..." << endl;
   // Create DStream instance
-  DenStream denStreamm(DIMENSIONS);
+  DenStream denStreamm(dataset.dim);
 
-  start = std::chrono::high_resolution_clock::now();
+  start = chrono::high_resolution_clock::now();
   for (int i = 0; i < NUM_POINTS; i += BATCH_SIZE) {
-    int end = std::min(i + BATCH_SIZE, NUM_POINTS);
-    std::vector<Point> batch(dataPoints.begin() + i, dataPoints.begin() + end);
+    int end = min(i + BATCH_SIZE, NUM_POINTS);
+    vector<Point> batch(dataset.points.begin() + i,
+                        dataset.points.begin() + end);
     denStreamm.cluster(batch);
   }
-  end = std::chrono::high_resolution_clock::now();
+  end = chrono::high_resolution_clock::now();
   elapsed = end - start;
-  std::cout << "DenStream execution time with batch size " << BATCH_SIZE << ": "
-            << elapsed.count() << " seconds" << std::endl;
+  cout << "DenStream execution time with batch size " << BATCH_SIZE << ": "
+       << elapsed.count() << " seconds" << endl;
 
   // Benchmark SLKMeans
-  std::cout << "Running SLKMeans ..." << std::endl;
+  cout << "Running SLKMeans ..." << endl;
   // Create SLKMeans instance
-  SLKMeans slkmeans(DIMENSIONS, K);
+  SLKMeans slkmeans(dataset.dim, K);
 
-  start = std::chrono::high_resolution_clock::now();
+  start = chrono::high_resolution_clock::now();
   for (int i = 0; i < NUM_POINTS; i += BATCH_SIZE) {
-    int end = std::min(i + BATCH_SIZE, NUM_POINTS);
-    std::vector<Point> batch(dataPoints.begin() + i, dataPoints.begin() + end);
+    int end = min(i + BATCH_SIZE, NUM_POINTS);
+    vector<Point> batch(dataset.points.begin() + i,
+                        dataset.points.begin() + end);
     slkmeans.cluster(batch);
   }
-  end = std::chrono::high_resolution_clock::now();
+  end = chrono::high_resolution_clock::now();
   elapsed = end - start;
-  std::cout << "SLKMeans execution time with batch size " << BATCH_SIZE << ": "
-            << elapsed.count() << " seconds" << std::endl;
+  cout << "SLKMeans execution time with batch size " << BATCH_SIZE << ": "
+       << elapsed.count() << " seconds" << endl;
 
   return 0;
 }

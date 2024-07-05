@@ -62,7 +62,7 @@ public:
     // Create cell coordinates for the point
     std::vector<double> cellCoordinates(dimensions);
     for (int i = 0; i < dimensions; ++i) {
-      cellCoordinates[i] = std::floor(point.coordinates[i] / CELL_SIZE);
+      cellCoordinates[i] = std::floor(point.features[i] / CELL_SIZE);
     }
 
     // Generate the cell key

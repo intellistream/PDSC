@@ -17,17 +17,21 @@
 #ifndef PDSC_COMMON_HPP
 #define PDSC_COMMON_HPP
 
-
-const int DIMENSIONS = 3;
-const int NUM_POINTS = 100000; // Total number of data points
-const int BATCH_SIZE = 1000; // Tunable batch size
-
-//Algorithm specific parameters.
-const double TIME_WINDOW = 1000.0; // used by CluStream and EDMStream
-const int K = 5; // used by SLKMeans.
-
 #include <cmath>
 #include <memory>
 #include <vector>
 
-#endif //PDSC_COMMON_HPP
+using u32 = uint32_t;
+using u64 = uint64_t;
+using f32 = float;
+using f64 = double;
+
+inline u32 DIMENSIONS = 10;    // Number of dimensions in the data
+inline u64 NUM_POINTS = 50000; // Total number of data points
+const u64 BATCH_SIZE = 1000;   // Tunable batch size
+
+// Algorithm specific parameters.
+const double TIME_WINDOW = 1000.0; // used by CluStream and EDMStream
+const int K = 5;                   // used by SLKMeans.
+
+#endif // PDSC_COMMON_HPP

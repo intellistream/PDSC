@@ -98,14 +98,14 @@ private:
             for (size_t i = 0; i < window.size(); ++i) {
                 int cluster = assignments[i];
                 for (int d = 0; d < dimensions; ++d) {
-                    newCentroids[cluster].coordinates[d] += window[i].coordinates[d];
+                    newCentroids[cluster].features[d] += window[i].features[d];
                 }
                 counts[cluster]++;
             }
             for (int j = 0; j < k; ++j) {
                 if (counts[j] > 0) {
                     for (int d = 0; d < dimensions; ++d) {
-                        newCentroids[j].coordinates[d] /= counts[j];
+                        newCentroids[j].features[d] /= counts[j];
                     }
                 }
             }
@@ -116,7 +116,7 @@ private:
     double calcDistance(const Point& a, const Point& b) const {
         double dist = 0.0;
         for (int i = 0; i < dimensions; ++i) {
-            dist += (a.coordinates[i] - b.coordinates[i]) * (a.coordinates[i] - b.coordinates[i]);
+            dist += (a.features[i] - b.features[i]) * (a.features[i] - b.features[i]);
         }
         return sqrt(dist);
     }

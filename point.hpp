@@ -17,25 +17,88 @@
 #ifndef PDSC_POINT_HPP
 #define PDSC_POINT_HPP
 
+#include "common.hpp"
+
+#include <cstdlib>
+#include <ctime>
+#include <fstream>
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 struct Point {
-  std::vector<double> coordinates;
-  double timestamp;
+  std::vector<f64> features;
+  u64 timestamp;
+  u64 true_clu_id;
 
-  Point(int dimensions) : coordinates(dimensions, 0.0), timestamp(0.0) {}
+  Point(int dim) : features(dim, 0.0), timestamp(0) {}
   Point(std::vector<double> coords, double timestamp = 0.0)
-      : coordinates(coords), timestamp(timestamp) {}
+      : features(coords), timestamp(timestamp) {}
   Point &operator/=(double scalar) {
-    for (int i = 0; i < coordinates.size(); i++) {
-      coordinates[i] /= scalar;
+    for (int i = 0; i < features.size(); i++) {
+      features[i] /= scalar;
     }
     return *this;
   }
+  double l2_dist(const Point &other) const {
+    double dist = 0.0;
+    for (int i = 0; i < features.size(); i++) {
+      dist +=
+          (features[i] - other.features[i]) * (features[i] - other.features[i]);
+    }
+    return sqrt(dist);
+  }
 };
 
-std::vector<Point> generateDataPoints(int numPoints, int dimensions);
+struct Dataset {
+  std::string name;
+  u64 num_points = 0;
+  u32 dim = 0, num_true_clusters = 0;
+  std::vector<Point> points;
+  void gen(u64 num_points, u32 dim) {
+    this->num_points = num_points;
+    this->dim = dim;
+    name = "random";
+    points.resize(num_points, Point(dim));
+    srand(static_cast<unsigned>(time(0)));
+    for (u64 i = 0; i < num_points; ++i) {
+      for (u32 j = 0; j < dim; ++j) {
+        points[i].features[j] = static_cast<double>(rand()) / RAND_MAX * 100;
+      }
+      points[i].timestamp = i; // Example timestamp, could be any sequence
+    }
+  }
+  void load(const std::string &filename) {
+    std::ifstream file(filename);
+    if (file.is_open()) {
+      {
+        // read header line: "# dataset_name num_points dim num_true_clusters"
+        std::string header;
+        std::getline(file, header);
+        std::stringstream ss(header);
+        std::string token;
+        ss >> token >> name >> num_points >> dim >> num_true_clusters;
+      }
+      for (int i = 0; i < num_points; ++i) {
+        Point point(dim);
+        std::string line;
+        std::getline(file, line);
+        std::stringstream ss(line);
+        std::string token;
+        for (int j = 0; j < dim; ++j) {
+          std::getline(ss, token, ',');
+          point.features[j] = std::stod(token);
+        }
+        std::getline(ss, token, ',');
+        point.true_clu_id = std::stoull(token);
+        points.push_back(point);
+      }
+      file.close();
+    }
+  }
+};
+
 std::ostream &operator<<(std::ostream &os, const Point &point);
+std::ostream &operator<<(std::ostream &os, const Dataset &dataset);
 
 #endif // PDSC_POINT_HPP

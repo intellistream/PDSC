@@ -19,33 +19,58 @@
 
 #include "point.hpp"
 
-#include <cstdlib>
-#include <ctime>
-#include <vector>
-
-std::vector<Point> generateDataPoints(int numPoints, int dimensions) {
-  std::vector<Point> dataPoints(numPoints, Point(dimensions));
-  srand(static_cast<unsigned>(time(0)));
-  for (int i = 0; i < numPoints; ++i) {
-    for (int j = 0; j < dimensions; ++j) {
-      dataPoints[i].coordinates[j] =
-          static_cast<double>(rand()) / RAND_MAX * 100;
-    }
-    dataPoints[i].timestamp = i; // Example timestamp, could be any sequence
-  }
-  return dataPoints;
-}
-
 // ostream operator for Point
 std::ostream &operator<<(std::ostream &os, const Point &point) {
-  os << "Point(";
-  for (int i = 0; i < point.coordinates.size(); i++) {
-    os << point.coordinates[i];
-    if (i < point.coordinates.size() - 1) {
-      os << ", ";
+  os << "Point[";
+  if (point.features.size() <= 5) {
+    for (int i = 0; i < point.features.size(); i++) {
+      os << point.features[i];
+      if (i < point.features.size() - 1) {
+        os << ", ";
+      }
+    }
+  } else {
+    for (int i = 0; i < 3; i++) {
+      os << point.features[i] << ", ";
+    }
+    os << "..., ";
+    for (int i = point.features.size() - 3; i < point.features.size(); i++) {
+      os << point.features[i];
+      if (i < point.features.size() - 1) {
+        os << ", ";
+      }
     }
   }
-  os << ")";
+  os << "]";
+  return os;
+}
+
+// ostream operator for Dataset
+std::ostream &operator<<(std::ostream &os, const Dataset &dataset) {
+  os << dataset.name << "{\n";
+  os << "\t# Points: " << dataset.num_points << "\n";
+  os << "\t# Dimensions: " << dataset.dim << "\n";
+  os << "\t# True Clusters: " << dataset.num_true_clusters << "\n";
+  if (dataset.points.size() <= 10) {
+    for (int i = 0; i < dataset.points.size(); i++) {
+      os << '\t' << dataset.points[i];
+      if (i < dataset.points.size() - 1) {
+        os << ", \n";
+      }
+    }
+  } else {
+    for (int i = 0; i < 5; i++) {
+      os << '\t' << dataset.points[i] << ", \n";
+    }
+    os << "\t..., \n";
+    for (int i = dataset.points.size() - 5; i < dataset.points.size(); i++) {
+      os << '\t' << dataset.points[i];
+      if (i < dataset.points.size() - 1) {
+        os << ", \n";
+      }
+    }
+  }
+  os << "\n}";
   return os;
 }
 

@@ -35,9 +35,9 @@ struct ClusteringFeature {
 
   void addPoint(const Point &point) {
     n++;
-    for (int i = 0; i < point.coordinates.size(); i++) {
-      linear_sum[i] += point.coordinates[i];
-      squared_sum[i] += point.coordinates[i] * point.coordinates[i];
+    for (int i = 0; i < point.features.size(); i++) {
+      linear_sum[i] += point.features[i];
+      squared_sum[i] += point.features[i] * point.features[i];
     }
   }
 
@@ -51,9 +51,9 @@ struct ClusteringFeature {
 
   double calcDistance(const Point &point) const {
     double dist = 0.0;
-    for (int i = 0; i < point.coordinates.size(); i++) {
+    for (int i = 0; i < point.features.size(); i++) {
       double mean = linear_sum[i] / n;
-      dist += (point.coordinates[i] - mean) * (point.coordinates[i] - mean);
+      dist += (point.features[i] - mean) * (point.features[i] - mean);
     }
     return sqrt(dist);
   }
@@ -204,7 +204,7 @@ private:
     return nullptr;
   }
 
-  const double threshold = 1.0; // Threshold for CF entry distance
+  const double threshold = 2500.0; // Threshold for CF entry distance
 };
 
 #endif // PDSC_BIRCH_HPP
