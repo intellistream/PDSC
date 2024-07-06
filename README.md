@@ -34,7 +34,7 @@ wget https://github.com/intellistream/PDSC/releases/download/dataset/covtype.csv
 ```
 Run the benchmark:
 ```bash
-./pdsc /path/to/{dataset}.csv
+./pdsc /path/to/{dataset}.csv [-n num_points]
 ```
 
 ## Real-world algorithms
