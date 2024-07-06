@@ -33,23 +33,38 @@
 using namespace std;
 using namespace std::chrono_literals;
 
-void run(const Dataset &dataset, Algorithm &algo) {
+void run(const string &name, const Dataset &dataset, Algorithm &algo) {
   auto start = chrono::high_resolution_clock::now();
   for (int i = 0; i < dataset.num_points; i += BATCH_SIZE) {
     int end = min(i + BATCH_SIZE, dataset.num_points);
     algo.cluster(vector<Point>(dataset.points.begin() + i,
                                dataset.points.begin() + end));
+    cout << "Progress: [" << (i + BATCH_SIZE) << " / " << dataset.num_points
+         << "]\r";
   }
+  cout << endl;
   auto end = chrono::high_resolution_clock::now();
   auto elapsed = chrono::duration_cast<chrono::milliseconds>(end - start);
   cout << "Execution time: " << elapsed.count() << " ms" << endl;
   auto centers = algo.output_centers();
   cout << "Number of clusters: " << centers.size() << endl;
-  assert(centers.size() > 0 && centers.size() <= 1000);
-  auto purity =
-      evaluate_purity(dataset.points, group_by_centers(dataset.points, centers),
-                      dataset.num_true_clusters, centers.size());
-  cout << "Purity: " << purity << endl;
+  // save centers to file
+  ofstream out(name + ".centers");
+  for (const auto &center : centers) {
+    for (int i = 0; i < center.features.size(); i++) {
+      out << center.features[i] << " ";
+    }
+    out << endl;
+  }
+  out.close();
+  if (centers.size() > 0 && centers.size() <= 1000) {
+    auto purity = evaluate_purity(dataset.points,
+                                  group_by_centers(dataset.points, centers),
+                                  dataset.num_true_clusters, centers.size());
+    cout << "Purity: " << purity << endl;
+  } else {
+    cout << "Purity: N/A, please check code correctness" << endl;
+  }
 }
 
 int main(int argc, char *argv[]) {
@@ -62,6 +77,7 @@ int main(int argc, char *argv[]) {
     dataset.gen(NUM_POINTS, DIMENSIONS);
   } else {
     dataset.load(argv[1]);
+    // dataset.limit(2000);
   }
 
   cout << dataset << endl;
@@ -70,37 +86,37 @@ int main(int argc, char *argv[]) {
   cout << "==============================" << endl;
   cout << "Running BIRCH ..." << endl;
   BIRCH birch(dataset.dim);
-  run(dataset, birch);
+  run("birch", dataset, birch);
 
   // Benchmark CluStream
   cout << "==============================" << endl;
   cout << "Running CluStream ..." << endl;
   CluStream clustream(dataset.dim);
-  run(dataset, clustream);
+  run("clustream", dataset, clustream);
 
   // Benchmark EDMStream
-  cout << "==============================" << endl;
-  cout << "Running EDMStream ..." << endl;
-  EDMStream edm(dataset.dim);
-  run(dataset, edm);
+  // cout << "==============================" << endl;
+  // cout << "Running EDMStream ..." << endl;
+  // EDMStream edm(dataset.dim);
+  // run("edmstream", dataset, edm);
 
   // Benchmark DStream
   cout << "==============================" << endl;
   cout << "Running DStream ..." << endl;
   DStream dstream(dataset.dim);
-  run(dataset, dstream);
+  run("dstream", dataset, dstream);
 
   // Benchmark DenStream
   cout << "==============================" << endl;
   cout << "Running DenStream ..." << endl;
   DenStream denstream(dataset.dim);
-  run(dataset, denstream);
+  run("denstream", dataset, denstream);
 
   // Benchmark SLKMeans
-  // cout << "==============================" << endl;
-  // cout << "Running SLKMeans ..." << endl;
-  // SLKMeans slkmeans(dataset.dim, dataset.num_true_clusters);
-  // run(dataset, slkmeans);
+  cout << "==============================" << endl;
+  cout << "Running SLKMeans ..." << endl;
+  SLKMeans slkmeans(dataset.dim, dataset.num_true_clusters);
+  run("slkmeans", dataset, slkmeans);
 
   return 0;
 }

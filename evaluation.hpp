@@ -40,26 +40,35 @@ std::vector<int> group_by_centers(const std::vector<Point> &points,
 double evaluate_purity(const std::vector<Point> &points,
                        const std::vector<int> &predicts, u32 num_true_clusters,
                        u32 num_pred_clusters) {
-  std::vector<std::vector<int>> cluster_to_label(
-      std::max(num_true_clusters, num_pred_clusters));
-
+  // for (int i = 0; i < points.size(); i++) {
+  //   std::cout << predicts[i] << " ";
+  // }
+  // std::cout << std::endl;
+  std::vector<std::vector<int>> confusion_matrix(
+      num_true_clusters + 1, std::vector<int>(num_pred_clusters));
   for (int i = 0; i < points.size(); i++) {
-    cluster_to_label[predicts[i]].push_back(points[i].true_clu_id - 1);
+    // std::cout << predicts[i] << " ";
+    confusion_matrix[points[i].true_clu_id][predicts[i]]++;
   }
-
-  double purity = 0.0;
-  for (int i = 0; i < num_true_clusters; i++) {
-    std::map<int, int> label_count;
-    for (int label : cluster_to_label[i]) {
-      label_count[label]++;
+  // std::cout << "Confusion Matrix:" << std::endl;
+  // for (int i = 1; i <= num_true_clusters; i++) {
+  //   for (int j = 0; j < num_pred_clusters; j++) {
+  //     std::cout << confusion_matrix[i][j] << " ";
+  //   }
+  //   std::cout << std::endl;
+  // }
+  double total = 0.0;
+  for (int i = 1; i <= num_true_clusters; i++) {
+    double max = 0.0;
+    for (int j = 0; j < num_pred_clusters; j++) {
+      if (confusion_matrix[i][j] > max) {
+        max = confusion_matrix[i][j];
+      }
     }
-    int max_count = 0;
-    for (const auto &pair : label_count) {
-      max_count = std::max(max_count, pair.second);
-    }
-    purity += max_count;
+    total += max;
   }
-  return purity / points.size();
+  // std::cout << "Total Purity: " << total << std::endl;
+  return total / (double)points.size();
 }
 
 #endif

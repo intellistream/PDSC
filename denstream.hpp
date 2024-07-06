@@ -24,7 +24,7 @@
 #include <limits>
 #include <vector>
 
-const double EPSILON = 1.0;
+const double EPSILON = 500.0;
 const int MIN_POINTS = 5;
 
 struct DenStreamMicroCluster {
@@ -117,7 +117,7 @@ public:
 private:
   int dimensions;
   std::deque<DenStreamMicroCluster> clusters;
-  const double TIME_WINDOW = 1000.0;
+  const double TIME_WINDOW = 10000.0;
 };
 
 #endif // DENSTREAM_HPP

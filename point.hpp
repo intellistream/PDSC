@@ -30,7 +30,7 @@ struct Point {
   std::vector<f64> features;
   u64 timestamp, true_clu_id;
 
-  Point(int dim) : features(dim, 0.0), timestamp(0) {}
+  Point(int dim = 0) : features(dim, 0.0), timestamp(0) {}
   Point(std::vector<double> coords, double timestamp = 0.0)
       : features(coords), timestamp(timestamp) {}
   Point &operator/=(double scalar) {
@@ -94,6 +94,12 @@ struct Dataset {
         points.push_back(point);
       }
       file.close();
+    }
+  }
+  void limit(u64 num_points) {
+    if (num_points && num_points < points.size()) {
+      points.resize((size_t)num_points);
+      this->num_points = num_points;
     }
   }
 };

@@ -204,7 +204,7 @@ private:
     return nullptr;
   }
 
-  const double threshold = 2500.0; // Threshold for CF entry distance
+  const double threshold = 1000.0; // Threshold for CF entry distance
 };
 
 #endif // PDSC_BIRCH_HPP

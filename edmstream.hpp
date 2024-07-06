@@ -22,16 +22,15 @@
 
 const int MAX_CLUSTERS = 100;
 const double DECAY_RATE = 0.01;
+const double DENSITY_THRESHOLD = 0.1;
 
 struct ClusterCell {
   Point seed;
-  double density;
-  double dependent_distance;
-  double creation_time;
+  double density = 0.0;
+  const double dependent_distance = 5000.0;
+  double creation_time = 0.0;
 
-  ClusterCell(int dimensions)
-      : seed(dimensions), density(0.0), dependent_distance(0.0),
-        creation_time(0.0) {}
+  ClusterCell(int dimensions) : seed(dimensions) {}
 
   void addPoint(const Point &point) {
     for (int i = 0; i < point.features.size(); i++) {
@@ -136,11 +135,13 @@ public:
   void output_centers_recursive(DPNode *node, std::vector<Point> &centers) {
     if (!node)
       return;
-    if (node->cell.density > 0.0) {
+    if (node->cell.density > DENSITY_THRESHOLD) {
+      // std::cout << "density: " << node->cell.density << std::endl;
       Point center(node->cell.seed.features);
       center /= node->cell.density;
       centers.push_back(center);
     }
+    // std::cout << "children size: " << node->children.size() << std::endl;
     for (auto &child : node->children) {
       output_centers_recursive(child, centers);
     }
