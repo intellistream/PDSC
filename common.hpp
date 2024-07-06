@@ -21,10 +21,6 @@
 #include <memory>
 #include <vector>
 
-#ifndef NDEBUG
-#define NDEBUG
-#endif
-
 using u32 = uint32_t;
 using u64 = uint64_t;
 using f32 = float;

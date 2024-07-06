@@ -57,6 +57,7 @@ struct Dataset {
   void gen(u64 num_points, u32 dim) {
     this->num_points = num_points;
     this->dim = dim;
+    this->num_true_clusters = num_points / 100 + 1;
     name = "random";
     points.resize(num_points, Point(dim));
     srand(static_cast<unsigned>(time(0)));
@@ -65,6 +66,7 @@ struct Dataset {
         points[i].features[j] = static_cast<double>(rand()) / RAND_MAX * 100;
       }
       points[i].timestamp = i; // Example timestamp, could be any sequence
+      points[i].true_clu_id = i % num_true_clusters + 1;
     }
   }
   void load(const std::string &filename) {

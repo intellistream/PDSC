@@ -27,6 +27,7 @@
 #include <cassert>
 #include <chrono>
 #include <cstdlib>
+#include <getopt.h>
 #include <iostream>
 #include <vector>
 
@@ -58,7 +59,7 @@ void run(const string &name, const Dataset &dataset, Algorithm &algo) {
   }
   out.close();
   if (centers.size() > 0 && centers.size() <= 1000) {
-    auto purity = evaluate_purity(dataset.points,
+    auto purity = evaluate_purity(points_to_labels(dataset.points),
                                   group_by_centers(dataset.points, centers),
                                   dataset.num_true_clusters, centers.size());
     cout << "Purity: " << purity << endl;
@@ -68,18 +69,37 @@ void run(const string &name, const Dataset &dataset, Algorithm &algo) {
 }
 
 int main(int argc, char *argv[]) {
-  cout << "Starting benchmarks..." << endl;
-
   Dataset dataset;
-  if (argc < 2) {
-    cout << "Usage: " << argv[0] << " <dataset>" << endl;
-    cout << "Using random generated dataset, results may vary." << endl;
-    dataset.gen(NUM_POINTS, DIMENSIONS);
-  } else {
-    dataset.load(argv[1]);
-    // dataset.limit(2000);
-  }
+  {
+    cout << "Loading dataset ..." << endl;
+    int flags, opt;
+    int num_points = NUM_POINTS;
+    bool num_points_set = false;
+    while ((opt = getopt(argc, argv, "n:")) != -1) {
+      switch (opt) {
+      case 'n':
+        num_points = atoi(optarg);
+        num_points_set = true;
+        break;
+      default: /* '?' */
+        cerr << "Usage: " << argv[0] << " [-n num_points] /path/to/dataset"
+             << endl;
+        exit(EXIT_FAILURE);
+      }
+    }
 
+    if (optind >= argc) {
+      cerr << "Usage: " << argv[0] << " [-n num_points] /path/to/dataset"
+           << endl;
+      cout << "Using random generated dataset, results may vary." << endl;
+      dataset.gen(num_points, DIMENSIONS);
+    } else {
+      dataset.load(argv[optind]);
+      if (num_points_set) {
+        dataset.limit(num_points);
+      }
+    }
+  }
   cout << dataset << endl;
 
   // Benchmark BIRCH
