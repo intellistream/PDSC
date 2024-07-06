@@ -37,30 +37,27 @@ Run the benchmark:
 ./pdsc /path/to/{dataset}.csv [-n num_points]
 ```
 
-## Real-world algorithms
-
-| Algorithm  | Window Model | Outlier Detection | Summarizing Data Structure | Offline Refinement |
-| ---------- | ------------ | ----------------- | -------------------------- | ------------------ |
-| BIRCH      | LandmarkWM   | OutlierD          | CFT                        | ❌                  |
-| CluStream  | LandmarkWM   | OutlierD-T        | MCs                        | ✅                  |
-| DenStream  | DampedWM     | OutlierD-BT       | MCs                        | ✅                  |
-| DStream    | DampedWM     | OutlierD-T        | Grids                      | ❌                  |
-| StreamKM++ | LandmarkWM   | NoOutlierD        | CoreT                      | ✅                  |
-| DBStream   | DampedWM     | OutlierD-T        | MCs                        | ✅                  |
-| EDMStream  | DampedWM     | OutlierD-BT       | DPT                        | ❌                  |
-| SL-KMeans  | SlidingWM    | NoOutlierD        | AMS                        | ❌                  |
-
-
 ## Datasets
 
-| DataSet   | Length                                | Dimension | Cluster Number         |
-| --------- | ------------------------------------- | --------- | ---------------------- |
-| CoverType | 581012                                | 54        | 7                      |
-| KDD-99    | 4898431                               | 41        | 23                     |
-| Insects   | 905145                                | 33        | 24                     |
-| Sensor    | 2219803                               | 5         | 55                     |
-| EDS       | 45690, 100270, 150645, 200060, 245270 | 2         | 75, 145, 218, 289, 363 |
-| ODS       | 94720,97360,100000                    | 2         | 90, 90, 90             |
+| DataSet   | Length | Dimensions | Cluster Number |
+| --------- | ------ | ---------- | -------------- |
+| CoverType | 581012 | 54         | 7              |
+
+
+## Baseline Performance
+
+| Algorithm | Execution Time | Purity (correctness check) | Num of Clusters (correctness check) |
+| --------- | -------------- | -------------------------- | ----------------------------------- |
+| BIRCH     | 1081 ms        | 0.0817814                  | 57                                  |
+| CluStream | 1001 ms        | 0.717314                   | 7                                   |
+| DStream   | 778 ms         | 0.770046                   | 101                                 |
+| DenStream | 1045 ms        | 0.374782                   | 15                                  |
+| SL-KMeans | 3082507 ms     | 0.171415                   | 7                                   |
+
+Baseline performance is tested on CoverType dataset with 581012 points. 
+- CPU: AMD Ryzen 7 5700U
+- RAM: 24GB DDR4 3200MHz
+
 
 
 ## Reference
