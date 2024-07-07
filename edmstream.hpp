@@ -20,14 +20,14 @@
 #include "algorithm.hpp"
 #include "common.hpp"
 
-const int MAX_CLUSTERS = 100;
+// const int MAX_CLUSTERS = 100;
 const double DECAY_RATE = 0.01;
-const double DENSITY_THRESHOLD = 0.1;
+const double DENSITY_THRESHOLD = 0.9;
 
 struct ClusterCell {
   Point seed;
   double density = 0.0;
-  const double dependent_distance = 5000.0;
+  const double dependent_distance = 500000.0;
   double creation_time = 0.0;
 
   ClusterCell(int dimensions) : seed(dimensions) {}
@@ -40,9 +40,7 @@ struct ClusterCell {
     seed.timestamp = point.timestamp;
   }
 
-  void decayDensity(double current_time) {
-    density *= exp(-DECAY_RATE * (current_time - seed.timestamp));
-  }
+  void decayDensity() { density *= exp(-DECAY_RATE); }
 
   double calcDistance(const Point &point) const {
     double dist = 0.0;
@@ -96,7 +94,10 @@ private:
   void decayClustersRecursive(DPNode *node, double current_time) {
     if (!node)
       return;
-    node->cell.decayDensity(current_time);
+    node->cell.decayDensity();
+    if (node->cell.density < DENSITY_THRESHOLD) {
+      node->children.clear();
+    }
     for (auto &child : node->children) {
       decayClustersRecursive(child, current_time);
     }
@@ -106,10 +107,13 @@ private:
 class EDMStream : public Algorithm {
 public:
   EDMStream(int dimensions) : dimensions(dimensions), dp_tree(new DPTree()) {}
-
+  int point_count = 0;
   void insert(const Point &point) {
     // Decay existing clusters
-    dp_tree->decayClusters(point.timestamp);
+    this->point_count++;
+    if (this->point_count % 200 == 0)
+      dp_tree->decayClusters(point.timestamp);
+    // dp_tree->decayClusters(point.timestamp);
 
     // Create a new cluster cell
     ClusterCell newCell(dimensions);
@@ -135,12 +139,12 @@ public:
   void output_centers_recursive(DPNode *node, std::vector<Point> &centers) {
     if (!node)
       return;
-    if (node->cell.density > DENSITY_THRESHOLD) {
-      // std::cout << "density: " << node->cell.density << std::endl;
-      Point center(node->cell.seed.features);
-      center /= node->cell.density;
-      centers.push_back(center);
-    }
+    // if (node->cell.density > DENSITY_THRESHOLD * 10^(-29)) {
+    // std::cout << "density: " << node->cell.density << std::endl;
+    Point center(node->cell.seed.features);
+    center /= node->cell.density;
+    centers.push_back(center);
+    // }
     // std::cout << "children size: " << node->children.size() << std::endl;
     for (auto &child : node->children) {
       output_centers_recursive(child, centers);

@@ -115,10 +115,10 @@ int main(int argc, char *argv[]) {
   run("clustream", dataset, clustream);
 
   // Benchmark EDMStream
-  // cout << "==============================" << endl;
-  // cout << "Running EDMStream ..." << endl;
-  // EDMStream edm(dataset.dim);
-  // run("edmstream", dataset, edm);
+  cout << "==============================" << endl;
+  cout << "Running EDMStream ..." << endl;
+  EDMStream edm(dataset.dim);
+  run("edmstream", dataset, edm);
 
   // Benchmark DStream
   cout << "==============================" << endl;
